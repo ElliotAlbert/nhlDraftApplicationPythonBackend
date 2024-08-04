@@ -24,4 +24,4 @@ def convert_to_team_object(get_logo):
     return teams
 
 
-convert_to_team_object()
+
