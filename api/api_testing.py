@@ -37,9 +37,21 @@ def sample_api_request():
         "cayenneExp": f"gameTypeId=2 and seasonId<={season_lower} and seasonId>={season_upper} and playerId={player_id}"
     }
     # Send the http request and capture the response within a variable
-    response = requests.get(url,params=params)
+    response = requests.get(url, params=params)
     if response.status_code == 200:
         # Do something with response
         print(response.json)
     else:
         print(f"Request failed with status code {response.status_code}")
+
+def get_all_teams():
+    url = "https://api.nhle.com/stats/rest/en/team"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        return response
+    else:
+        return response
+
+
+get_all_teams()
