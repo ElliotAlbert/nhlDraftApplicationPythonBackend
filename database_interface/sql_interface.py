@@ -15,7 +15,6 @@ def create_connection():
 
 def save_team_to_database(team, cursor, connection):
     try:
-        # Check if the team exists in the database TODO place this in a function to be reused
         check_exist_query = f"SELECT EXISTS (SELECT 1 FROM teams WHERE triCode = %s)"
         cursor.execute(check_exist_query, (team.triCode,))
         exists = cursor.fetchone()[0]
@@ -93,6 +92,7 @@ def save_players_to_database(cursor, connection, player):
         connection.commit()
 
     except mysql.connector.Error as error:
+        # TODO Add error handling and logging
         print(f"Failed to insert record into player table: {error}")
 
 
@@ -114,6 +114,8 @@ teams = api_convert.convert_to_team_object(get_logo=False)
 for team in teams:
     roster = api_convert.convert_roster_to_player_objects(team.triCode)
     if roster == 404:
+        # TODO remove team entry if there is no active roster
+        # This will prevent pointless api calls if the team is not active
         print(f"Failed to get roster for {team.triCode}")
     else:
         cursor, connection = create_connection()
