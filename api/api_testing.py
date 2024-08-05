@@ -1,4 +1,4 @@
-'''
+"""
 -All Teams in database
 https://api.nhle.com/stats/rest/en/team
 Returns all the teams that exist
@@ -23,8 +23,10 @@ params = {
     "cayenneExp": "gameTypeId=2 and seasonId<=20232024 and seasonId>=20232024 and playerId=8477903"
 } This is all the api endpoints we should need for implementing the whole application
 
-'''
+"""
 import requests
+
+
 def sample_api_request():
     season_lower = "20232024"
     season_upper = "20232024"
@@ -44,6 +46,7 @@ def sample_api_request():
     else:
         print(f"Request failed with status code {response.status_code}")
 
+
 def get_all_teams():
     url = "https://api.nhle.com/stats/rest/en/team"
     response = requests.get(url)
@@ -54,4 +57,14 @@ def get_all_teams():
         return response
 
 
-get_all_teams()
+def get_team_roster(triCode):
+    url = f"https://api-web.nhle.com/v1/roster/{triCode}/current"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        return response
+    else:
+        return response
+
+
+
