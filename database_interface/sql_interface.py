@@ -1,6 +1,6 @@
 import mysql.connector
 from mysql.connector import Error
-import database_connection_variables as db_vars
+import database_interface.database_connection_variables as db_vars
 import api.api_conversion_layer as api_convert
 
 

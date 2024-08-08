@@ -67,4 +67,13 @@ def get_team_roster(triCode):
         return response
 
 
+def get_schedule():
+    url = "https://api-web.nhle.com/v1/schedule/now"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        return response
+    else:
+        return response
+
 

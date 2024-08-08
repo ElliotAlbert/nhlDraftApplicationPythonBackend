@@ -22,3 +22,17 @@ class player:
         self.heightCm = heightCm
         self.weightKg = weightKg
         self.playerId = playerId
+
+
+class scheduled_game:
+    def __init__(self, game_Id, season, date, update_time, home_team_Id, away_team_Id, home_team_triCode, away_team_triCode):
+        self.game_Id = game_Id
+        self.season = season
+        self.date = date
+        self.update_time = update_time
+        self.home_team_Id = home_team_Id
+        self.away_team_Id = away_team_Id
+        self.home_team_triCode = home_team_triCode
+        self.away_team_triCode = away_team_triCode
+
+    # Might be worth making the check function for whether this has passed an inherent function of the class

@@ -1,6 +1,9 @@
 import data_structures.data_structures as data_struct
 import api.api_testing as api_test  # TODO change this to final api manager when it is finished
 import json
+import datetime
+
+from update_cycle.database_update_manager import game_is_logged
 
 
 def convert_to_team_object(get_logo):
@@ -60,5 +63,38 @@ def convert_roster_to_player_objects(triCode):
     return roster
 
 
+def create_new_schedule_object(game):
+    hold_game = data_struct.scheduled_game(0, 0, "date", "update_time", 0, 0, 'aaa', 'aaa')
+    hold_game.game_Id = game['id']
+    hold_game.season = game['season']
+    hold_game.date = datetime.datetime.strptime(game['startTimeUTC'], '%Y-%m-%dT%H:%M:%SZ')
+    hold_game.update_time = hold_game.date + datetime.timedelta(hours=4)
+    hold_game.away_team_triCode = game['awayTeam']['abbrev']
+    hold_game.home_team_triCode = game['homeTeam']['abbrev']
+    # TODO implement team id outside of this function
+    return hold_game
 
 
+# This function is just to prevent circular imports
+def check_against_logged(id, logged_games):
+    for game in logged_games:
+        if id == game.game_Id:
+            return True
+
+
+def convert_schedule(logged_games):
+    games = []
+    response = api_test.get_schedule()
+    if response.status_code != 200:
+        return response.status_code
+    parsed = json.loads(response.text)
+    for day in parsed['gameWeek']:
+        # We wanna check if the games are already logged
+        for game in day['games']:
+            if not check_against_logged(game['id'], logged_games):
+                hold_game = create_new_schedule_object(game)
+                games.append(hold_game)
+    return games
+
+
+convert_schedule()
