@@ -3,7 +3,6 @@ import api.api_testing as api_test  # TODO change this to final api manager when
 import json
 import datetime
 
-from update_cycle.database_update_manager import game_is_logged
 
 
 def convert_to_team_object(get_logo):
@@ -97,4 +96,4 @@ def convert_schedule(logged_games):
     return games
 
 
-convert_schedule()
+

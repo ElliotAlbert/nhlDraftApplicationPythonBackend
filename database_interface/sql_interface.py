@@ -96,11 +96,31 @@ def save_players_to_database(cursor, connection, player):
         print(f"Failed to insert record into player table: {error}")
 
 
-def get_team_id_by_tricode(team_tricode, cursor):
+def get_team_id_by_tricode(team_tricode):
+    cursor, connection = create_connection()
     query = "SELECT id FROM teams WHERE triCode = %s"
     cursor.execute(query, (team_tricode,))
     team_id = cursor.fetchone()[0]
+    close_connection(cursor, connection)
     return team_id
+
+
+def get_skater_id_by_team_id(team_id):
+    cursor, connection = create_connection()
+    query = f"SELECT playerId FROM skaters WHERE teamId = {team_id}"
+    cursor.execute(query)
+    player_ids = cursor.fetchall()
+    close_connection(cursor, connection)
+    return player_ids
+
+
+def get_keeper_id_by_team_id(team_id):
+    cursor, connection = create_connection()
+    query = f"SELECT playerId FROM keepers WHERE teamId = {team_id}"
+    cursor.execute(query)
+    player_ids = cursor.fetchall()
+    close_connection(cursor, connection)
+    return player_ids
 
 
 def close_connection(cursor, connection):
@@ -110,17 +130,4 @@ def close_connection(cursor, connection):
         print("MySQL connection is closed")
 
 
-teams = api_convert.convert_to_team_object(get_logo=False)
-for team in teams:
-    roster = api_convert.convert_roster_to_player_objects(team.triCode)
-    if roster == 404:
-        # TODO remove team entry if there is no active roster
-        # This will prevent pointless api calls if the team is not active
-        print(f"Failed to get roster for {team.triCode}")
-    else:
-        cursor, connection = create_connection()
-        teamId = get_team_id_by_tricode(team.triCode, cursor)
-        for player in roster:
-            player.teamID = teamId
-            save_players_to_database(cursor, connection, player)
-        close_connection(cursor, connection)
+
