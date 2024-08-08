@@ -9,6 +9,7 @@ Place the update time for 4 hours after the game is scheduled to start
 import data_structures.data_structures as data_struct
 from api.api_conversion_layer import convert_schedule
 # TODO implement something to check for the season ending
+# TODO implement a way of checking for changes of times in the schedule and updating the update time accordingly
 """
 All this would change is the season ID of the skater/keeper_stats database entries 
 """
