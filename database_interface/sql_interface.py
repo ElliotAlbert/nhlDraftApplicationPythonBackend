@@ -111,6 +111,8 @@ def get_skater_id_by_team_id(team_id):
     cursor.execute(query)
     player_ids = cursor.fetchall()
     close_connection(cursor, connection)
+    # Convert the list of tuples into a list of integers (player IDs)
+    player_ids = [item[0] for item in player_ids]
     return player_ids
 
 
@@ -120,6 +122,8 @@ def get_keeper_id_by_team_id(team_id):
     cursor.execute(query)
     player_ids = cursor.fetchall()
     close_connection(cursor, connection)
+    # Convert the list of tuples into a list of integers (player IDs)
+    player_ids = [item[0] for item in player_ids]
     return player_ids
 
 

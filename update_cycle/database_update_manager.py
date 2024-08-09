@@ -11,6 +11,7 @@ from api.api_conversion_layer import convert_schedule
 from database_interface import sql_interface
 import time
 import datetime
+import api.api_conversion_layer as api_convert
 # TODO implement something to check for the season ending
 # TODO implement a way of checking for changes of times in the schedule and updating the update time accordingly
 # TODO implement function locks when implementing the web socket to prevent multiple threads from accessing the same
@@ -31,7 +32,26 @@ def update_team_stats(triCode):
     :param triCode: The teams tricode
     :return: Nothing
     """
+    # Get current team roster
+    roster = api_convert.convert_roster_to_player_objects(triCode)
+    team_id = sql_interface.get_team_id_by_tricode(triCode)
+    # TODO add logging
+    for player in roster:
+        cursor, connection = sql_interface.create_connection()
+        player.teamID = team_id
+        sql_interface.save_players_to_database(cursor, connection, player)
+        sql_interface.close_connection(cursor, connection)
+    # Reload roster with all players in the database
+    skaters = sql_interface.get_skater_id_by_team_id(team_id)
+    keepers = sql_interface.get_keeper_id_by_team_id(team_id)
+    """
+    TODO implement matts functions to update player stats 
+    Matt you could do this if you should want so :) 
+    """
     return None
+
+
+update_team_stats('LAK')
 
 
 def update_cycle():
