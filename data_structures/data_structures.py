@@ -1,25 +1,29 @@
-class skaterStats:
+
+# Y is game logbook api call for the player,
+# X is the player stats aggregate by seasons,
+# C is additional stats aggregated by seasons
+class skater_stats:
     def __init__(self, id, playerId, season, playoffs, gamesPlayed, goals, assists, points, plusMinus, pointsPerGame, evenStrengthGoals, evenStrengthPoints, powerPlayGoals, powerPlayPoints, shortHandedGoals, shortHandedPoints, overTimeGoals, gameWinningGoals, gameFirstGoals, hits, blockedShots, emptyNetGoals, FaceoffWinPercentage):
         self.id = id,
-        self.playerId = playerId, #Y
-        self.season = season, #Y
+        self.playerId = playerId, #Y,X
+        self.season = season, #Y,X
         self.playoffs = playoffs, #Y
-        self.gamesPlayed = gamesPlayed, #get the length of the gamelog
-        self.goals = goals, #Y
-        self.assists = assists, #Y
-        self.points = points, #Y
-        self.plusMinus = plusMinus, #Y
-        self.pointsPerGame = pointsPerGame, #DO a function to grab average
-        self.evenStrengthGoals = evenStrengthGoals,
-        self.evenStrengthPoints = evenStrengthPoints,
-        self.powerPlayGoals = powerPlayGoals, #Y
-        self.powerPlayPoints = powerPlayPoints,#Y
-        self.shortHandedGoals = shortHandedGoals, #Y
-        self.shortHandedPoints = shortHandedPoints, #Y
-        self.overTimeGoals = overTimeGoals, #Y
-        self.gameWinningGoals = gameWinningGoals, #Y
-        self.gameFirstGoals = gameFirstGoals,
-        self.hits = hits,
-        self.blockedShots = blockedShots,
-        self.emptyNetGoals = emptyNetGoals,
-        self.FaceoffWinPercentage = FaceoffWinPercentage
+        self.gamesPlayed = gamesPlayed, #X, C
+        self.goals = goals, #Y, X
+        self.assists = assists, #Y, X
+        self.points = points, #Y, X
+        self.plusMinus = plusMinus, #Y, X
+        self.pointsPerGame = pointsPerGame, #X
+        self.evenStrengthGoals = evenStrengthGoals, #X
+        self.evenStrengthPoints = evenStrengthPoints, #X
+        self.powerPlayGoals = powerPlayGoals, #Y, X
+        self.powerPlayPoints = powerPlayPoints,#Y, X
+        self.shortHandedGoals = shortHandedGoals, #Y, X
+        self.shortHandedPoints = shortHandedPoints, #Y, X
+        self.overTimeGoals = overTimeGoals, #Y, X, C
+        self.gameWinningGoals = gameWinningGoals, #Y, X
+        self.gameFirstGoals = gameFirstGoals, #X, C
+        self.hits = hits, #C
+        self.blockedShots = blockedShots, #C
+        self.emptyNetGoals = emptyNetGoals, #C
+        self.FaceoffWinPercentage = FaceoffWinPercentage #X
