@@ -1,3 +1,3 @@
 # WIP 
 ## This project is currently being worked on
-You can view changes within the development branches while we wait to release an official version 1.0 
+V1.0 Currently includes database manager with working update cycle allowing for keeping of up to date stats as new games are scheduled and played. 
