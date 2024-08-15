@@ -57,8 +57,8 @@ def get_all_teams():
         return response
 
 
-def get_team_roster(triCode):
-    url = f"https://api-web.nhle.com/v1/roster/{triCode}/current"
+def get_team_roster(triCode, season):
+    url = f"https://api-web.nhle.com/v1/roster/{triCode}/{season}"
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
@@ -76,6 +76,7 @@ def get_schedule():
     else:
         return response
 
+
 def get_player_stats_gamebook(player_id, season, game_type):
     url = f"https://api-web.nhle.com/v1/player/{player_id}/game-log/{season}/{game_type}"
 
@@ -87,21 +88,51 @@ def get_player_stats_gamebook(player_id, season, game_type):
         return 404
 
 
-def get_player_stats_seasonal_hits(player_id):
-    url_player_stats_hits = f"https://api.nhle.com/stats/rest/en/skater/realtime?cayenneExp=playerId={player_id}"
-    response = requests.get(url_player_stats_hits)
-
+def get_player_stats_seasonal_hits(player_id, season_lower, season_upper, playoffs):
+    url = "https://api.nhle.com/stats/rest/en/skater/realtime"
+    gameType = 2
+    if playoffs:
+        gameType = 3
+    params = {
+        "limit": 50,
+        "cayenneExp": f"gameTypeId={gameType} and seasonId<={season_lower} and seasonId>={season_upper} and playerId={player_id}"
+    }
+    response = requests.get(url, params=params)
     if response.status_code == 200:
         return response.json()
     else:
         return 404
 
 
-def get_player_stats_seasonal(player_id):
-    url_player_stats = f"https://api.nhle.com/stats/rest/en/skater/summary?cayenneExp=playerId={player_id}"
-    response = requests.get(url_player_stats)
-
+def get_player_stats_seasonal(player_id, season_lower, season_upper, playoffs):
+    url_player_stats = f"https://api.nhle.com/stats/rest/en/skater/summary"
+    gameType = 2
+    if playoffs:
+        gameType = 3
+    params = {
+        "limit": 50,
+        "cayenneExp": f"gameTypeId={gameType} and seasonId<={season_lower} and seasonId>={season_upper} and playerId={player_id}"
+    }
+    response = requests.get(url_player_stats, params=params)
     if response.status_code == 200:
         return response.json()
     else:
         return 404
+
+
+def get_keeper_stats_seasonal(player_id, season_lower, season_upper, playoffs):
+    url = f"https://api.nhle.com/stats/rest/en/goalie/summary"
+    game_type = 2
+    if playoffs:
+        game_type = 3
+    params = {
+        "limit": 50,
+        "cayenneExp": f"gameTypeId={game_type} and seasonId<={season_lower} and seasonId>={season_upper} and playerId={player_id}"
+    }
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return 404
+
+

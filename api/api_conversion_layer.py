@@ -1,5 +1,5 @@
 import data_structures.data_structures as data_struct
-import api.api_testing as api_test  # TODO change this to final api manager when it is finished
+import api.api_testing as api_test
 import json
 import datetime
 
@@ -7,6 +7,10 @@ import datetime
 
 def convert_to_team_object(get_logo):
     # TODO implement get_logo logic
+    """
+    :param get_logo: This can be set to false always as there is currently no application for this
+    :return: A list of team objects converted from the api layer
+    """
     teams = []
     response = api_test.get_all_teams()
     if response.status_code != 200:
@@ -44,9 +48,9 @@ def create_new_player_object(player):
     return hold_player
 
 
-def convert_roster_to_player_objects(triCode):
+def convert_roster_to_player_objects(triCode, season):
     roster = []
-    response = api_test.get_team_roster(triCode)
+    response = api_test.get_team_roster(triCode, season)
     if response.status_code != 200:
         return response.status_code
     parsed = json.loads(response.text)
@@ -63,14 +67,16 @@ def convert_roster_to_player_objects(triCode):
 
 
 def create_new_schedule_object(game):
-    hold_game = data_struct.scheduled_game(0, 0, "date", "update_time", 0, 0, 'aaa', 'aaa')
+    hold_game = data_struct.scheduled_game(0, 0, "date", "update_time", 0, 0, 'aaa', 'aaa',0)
     hold_game.game_Id = game['id']
     hold_game.season = game['season']
     hold_game.date = datetime.datetime.strptime(game['startTimeUTC'], '%Y-%m-%dT%H:%M:%SZ')
     hold_game.update_time = hold_game.date + datetime.timedelta(hours=4)
     hold_game.away_team_triCode = game['awayTeam']['abbrev']
     hold_game.home_team_triCode = game['homeTeam']['abbrev']
-    # TODO implement team id outside of this function
+    hold_game.playoffs = 0
+    if game['gameType'] == 3:
+        hold_game.playoffs = 1
     return hold_game
 
 
@@ -97,70 +103,76 @@ def convert_schedule(logged_games):
 
 
 # season as int eg. 20232024
-def convert_player_stats_to_skater_stats_object(player_id, season):
-    response_main = api_testing.get_player_stats_seasonal(player_id)
-    response_hits = api_testing.get_player_stats_seasonal_hits(player_id)
-
+def convert_player_stats_to_skater_stats_object(player_id, season, playoffs):
+    response_main = api_test.get_player_stats_seasonal(player_id, season, season, playoffs)
+    response_hits = api_test.get_player_stats_seasonal_hits(player_id, season, season, playoffs)
     if response_main == 404:
         return 404
     elif response_hits == 404:
         return 404
-
     skater_stats = data_struct.skater_stats(
-        id=id,
-        playerId=player_id,
-        season=season,
-        playoffs=0,
-        gamesPlayed=0,
-        goals=0,
-        assists=0,
-        points=0,
-        plusMinus=0,
-        pointsPerGame=0,
-        evenStrengthGoals=0,
-        evenStrengthPoints=0,
-        powerPlayGoals=0,
-        powerPlayPoints=0,
-        shortHandedGoals=0,
-        shortHandedPoints=0,
-        overTimeGoals=0,
-        gameWinningGoals=0,
-        FaceoffWinPercentage=0,
-        blockedShots=0,
-        emptyNetGoals=0,
-        gameFirstGoals=0,
-        hits=0
+    0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,
+    0,0,0,0,0,0
     )
 
+    if len(response_main["data"]) == 0:
+        return 404
     skater_stats.playerId = player_id
     skater_stats.season = season
-    skater_stats.playoffs = 0
-
-    for season_in in response_main["data"]:
-        if season_in.get("seasonId") == season:
-            skater_stats.gamesPlayed = season_in.get("gamesPlayed")
-            skater_stats.goals = season_in.get("goals")
-            skater_stats.assists = season_in.get("assists")
-            skater_stats.points = season_in.get("points")
-            skater_stats.plusMinus = season_in.get("plusMinus")
-            skater_stats.pointsPerGame = season_in.get("pointsPerGame")
-            skater_stats.evenStrengthGoals = season_in.get("evGoals")
-            skater_stats.evenStrengthPoints = season_in.get("evPoints")
-            skater_stats.powerPlayGoals = season_in.get("ppGoals")
-            skater_stats.powerPlayPoints = season_in.get("ppPoints")
-            skater_stats.shortHandedGoals = season_in.get("shGoals")
-            skater_stats.shortHandedPoints = season_in.get("shPoints")
-            skater_stats.overTimeGoals = season_in.get("otGoals")
-            skater_stats.gameWinningGoals = season_in.get("gameWinningGoals")
-            skater_stats.FaceoffWinPercentage = season_in.get("faceoffWinPct")
-
-    for season_in in response_hits["data"]:
-        if season_in.get("seasonId") == season:
-            skater_stats.blockedShots = season_in["blockedShots"]
-            skater_stats.emptyNetGoals = season_in["emptyNetGoals"]
-            skater_stats.gameFirstGoals = season_in["firstGoals"]
-            skater_stats.hits = season_in["hits"]
+    skater_stats.playoffs = playoffs
+    skater_stats.gamesPlayed = response_main['data'][0].get("gamesPlayed")
+    skater_stats.goals = response_main['data'][0].get("goals")
+    skater_stats.assists = response_main['data'][0].get("assists")
+    skater_stats.points = response_main['data'][0].get("points")
+    skater_stats.plusMinus = response_main['data'][0].get("plusMinus")
+    skater_stats.pointsPerGame = response_main['data'][0].get("pointsPerGame")
+    skater_stats.evenStrengthGoals = response_main['data'][0].get("evGoals")
+    skater_stats.evenStrengthPoints = response_main['data'][0].get("evPoints")
+    skater_stats.powerPlayGoals = response_main['data'][0].get("ppGoals")
+    skater_stats.powerPlayPoints = response_main['data'][0].get("ppPoints")
+    skater_stats.shortHandedGoals = response_main['data'][0].get("shGoals")
+    skater_stats.shortHandedPoints = response_main['data'][0].get("shPoints")
+    skater_stats.overTimeGoals = response_main['data'][0].get("otGoals")
+    skater_stats.gameWinningGoals = response_main['data'][0].get("gameWinningGoals")
+    skater_stats.FaceoffWinPercentage = response_main['data'][0].get("faceoffWinPct")
+    skater_stats.blockedShots = response_hits['data'][0]["blockedShots"]
+    skater_stats.emptyNetGoals = response_hits['data'][0]["emptyNetGoals"]
+    skater_stats.gameFirstGoals = response_hits['data'][0]["firstGoals"]
+    skater_stats.hits = response_hits['data'][0]["hits"]
+    skater_stats.penaltyMinutes = response_main['data'][0]["penaltyMinutes"]
 
     return skater_stats
 
+
+def convert_keepers_stats_to_keeper_stats_object(player_id, season, playoffs):
+    response = api_test.get_keeper_stats_seasonal(player_id, season, season, playoffs)
+    if len(response['data']) == 0:
+        return 404
+    keeper_stats = data_struct.keeper_stats(
+    0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0)
+    keeper_stats.playerId = player_id
+    keeper_stats.season = season
+    keeper_stats.gamesPlayed = response['data'][0].get("gamesPlayed")
+    keeper_stats.gamesStarted = response['data'][0].get("gamesStarted")
+    keeper_stats.wins = response['data'][0].get("wins")
+    keeper_stats.losses = response['data'][0].get("losses")
+    keeper_stats.overtimeLosses = response['data'][0].get("otLosses")
+    keeper_stats.shotsAgainst = response['data'][0].get("shotsAgainst")
+    keeper_stats.saves = response['data'][0].get("saves")
+    keeper_stats.goalsAgainst = response['data'][0].get("goalsAgainst")
+    keeper_stats.savePercentage = response['data'][0].get("savePct")
+    keeper_stats.goalsAgainstAverage = response['data'][0].get("goalsAgainstAverage")
+    keeper_stats.timeOnIce = response['data'][0].get("timeOnIce")
+    keeper_stats.shutOuts = response['data'][0].get("shutouts")
+    keeper_stats.goals = response['data'][0].get("goals")
+    keeper_stats.assists = response['data'][0].get("assists")
+    keeper_stats.points = response['data'][0].get("points")
+    keeper_stats.penaltyMinutes = response['data'][0].get("penaltyMinutes")
+    keeper_stats.playoffs = playoffs
+    return keeper_stats
+
+
+convert_player_stats_to_skater_stats_object(8478402, 20242025, 1)
 
